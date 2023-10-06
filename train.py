@@ -7,6 +7,7 @@ import pickle
 import os
 
 import torch.nn
+
 from utils import print_and_add_to_log, get_datasets_for_ViT, \
     Identity, freeze_finetuned_model, train, plot_graphs, \
     extract_fetures
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     elif args['dataset'] == 'cats_vs_dogs':
         _classes = range(2)
     elif args['dataset'] == 'dior':
-        _classes = range(19)
+        _classes = range(19)   ## TODO put MVTEC here 
     else:
         raise ValueError(f"Does not support the {args['dataset']} dataset")
     # create the relevant directories
@@ -70,7 +71,7 @@ if __name__ == '__main__':
                'pretrained_and_finetuned_AUROC_scores': []}
 
 
-
+    # for each of the classes in an 
     for _class in _classes:
         print_and_add_to_log("===================================", logging)
         print_and_add_to_log(f"Class is : {_class}", logging)
@@ -102,6 +103,8 @@ if __name__ == '__main__':
             "====================================================================",
             logging)
 
+
+        # TODO make sure to save the sets properly according to their contamination
         trainset, testset = get_datasets_for_ViT(dataset=args['dataset'],
                                                  data_path=args['data_path'],
                                                  one_vs_rest=args['unimodal'],
@@ -125,6 +128,11 @@ if __name__ == '__main__':
         print_and_add_to_log(f'OOD testset size: {len(ood_test_set)}', logging)
         print_and_add_to_log("---------------", logging)
 
+
+
+
+        # 
+
         train_loader = torch.utils.data.DataLoader(trainset, batch_size=args['batch_size'],
                                                    shuffle=True)
         val_loader = torch.utils.data.DataLoader(testset, batch_size=args['batch_size'],
@@ -142,10 +150,17 @@ if __name__ == '__main__':
             VIT_MODEL_NAME = 'B_16_imagenet1k'
         else:
             VIT_MODEL_NAME = 'B_16'
+        
+
+
+        ## TODO need to understand this part
+
+
 
         # Build model
         model = AnomalyViT(VIT_MODEL_NAME, pretrained=True)
         model.fc = Identity()
+
         # Build model for best instance
         best_model = AnomalyViT(VIT_MODEL_NAME, pretrained=True)
         best_model.fc = Identity()
@@ -198,6 +213,8 @@ if __name__ == '__main__':
             MODEL_NAME = 'B_16_imagenet1k'
         else:
             MODEL_NAME = 'B_16'
+
+
 
         model = ViT(MODEL_NAME, pretrained=True)
         model.fc = Identity()
