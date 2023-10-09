@@ -612,7 +612,7 @@ def get_datasets_for_ViT(dataset:str, data_path:str, one_vs_rest:bool, _class,
 
     trainset = torch.utils.data.Subset(trainset_origin, train_indices) # split data into anomaly and normal classes
 
-    
+
 
     if normal_test_sample_only:
         test_indices = [i for i, val in enumerate(testset.targets)
@@ -670,7 +670,7 @@ def get_datasets(dataset, data_path, val_transforms):
         testset = ImageFolder(root=data_path,
                               transform=val_transforms)
 
-    #TODO implement for mvtec
+    #TODO implement get dataset for mvtec
 
     else:
         raise ValueError(f"{dataset} not supported yet!")
