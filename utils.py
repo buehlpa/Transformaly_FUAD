@@ -551,6 +551,8 @@ def get_transforms(dataset, use_imagenet):
         ]
 
 
+    ## TODO Transformations for MVTEC
+
     else:
         val_transforms_list = [
             transforms.Resize((384, 384)) if use_imagenet else transforms.Resize((224, 224)),
@@ -586,7 +588,7 @@ def get_number_of_classes(dataset):
     return number_of_classes
 
 
-def get_datasets_for_ViT(dataset, data_path:str, one_vs_rest:bool, _class,
+def get_datasets_for_ViT(dataset:str, data_path:str, one_vs_rest:bool, _class,
                          normal_test_sample_only=True,
                          use_imagenet=False):
     
@@ -598,8 +600,8 @@ def get_datasets_for_ViT(dataset, data_path:str, one_vs_rest:bool, _class,
     else:
         anomaly_classes = [_class]
 
-    val_transforms = get_transforms(dataset=dataset,
-                                    use_imagenet=use_imagenet)
+    # preprocess images 
+    val_transforms = get_transforms(dataset=dataset,use_imagenet=use_imagenet)
 
     # get dataset
     trainset_origin, testset = get_datasets(dataset, data_path, val_transforms)  # specific for dataset returns torch dataset type

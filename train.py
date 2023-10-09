@@ -37,6 +37,7 @@ if __name__ == '__main__':
     args['use_imagenet'] = True
     BASE_PATH = 'experiments'
 
+    # Set dataset
     if args['dataset'] == 'cifar10':
         _classes = range(10)
     elif args['dataset'] == 'fmnist':
@@ -46,9 +47,10 @@ if __name__ == '__main__':
     elif args['dataset'] == 'cats_vs_dogs':
         _classes = range(2)
     elif args['dataset'] == 'dior':
-        _classes = range(19)   ## TODO put MVTEC here 
+        _classes = range(19)   ## TODO put MVTEC  classes here 
     else:
         raise ValueError(f"Does not support the {args['dataset']} dataset")
+    
     # create the relevant directories
     if not os.path.exists(
             join(BASE_PATH,
@@ -71,7 +73,7 @@ if __name__ == '__main__':
                'pretrained_and_finetuned_AUROC_scores': []}
 
 
-    # for each of the classes in an 
+    # for each of the classes in the dataset 
     for _class in _classes:
         print_and_add_to_log("===================================", logging)
         print_and_add_to_log(f"Class is : {_class}", logging)
@@ -89,6 +91,7 @@ if __name__ == '__main__':
         if not os.path.exists(model_path):
             os.makedirs(model_path)
 
+        # OVR 
         if args['unimodal']:
             anomaly_classes = [i for i in _classes if i != args['_class']]
         else:
@@ -105,6 +108,8 @@ if __name__ == '__main__':
 
 
         # TODO make sure to save the sets properly according to their contamination
+
+
         trainset, testset = get_datasets_for_ViT(dataset=args['dataset'],
                                                  data_path=args['data_path'],
                                                  one_vs_rest=args['unimodal'],
@@ -112,10 +117,10 @@ if __name__ == '__main__':
                                                  normal_test_sample_only=True,
                                                  use_imagenet=args['use_imagenet']
                                                  )
-
+        ##  get all the test data which are not in the distribution
         _, ood_test_set = get_datasets_for_ViT(dataset=args['dataset'],
                                                data_path=args['data_path'],
-                                               one_vs_rest=not args['unimodal'],
+                                               one_vs_rest=not args['unimodal'],   
                                                _class=args['_class'],
                                                normal_test_sample_only=True,
                                                use_imagenet=args['use_imagenet']
@@ -153,7 +158,8 @@ if __name__ == '__main__':
         
 
 
-        ## TODO need to understand this part
+        ## TODO understand Anomaly VIT
+        
 
 
 
