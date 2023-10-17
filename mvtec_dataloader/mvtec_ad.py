@@ -300,3 +300,24 @@ class MVTecAD(VisionDataset):
         for path in paths:
             images.append(self._pil_loader(mode, path))
         return images
+
+
+### helperfuncitons
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def inspect_dataloader(dataloader,n_batches=10):
+
+    # Display only the first image from the first n_batches batches
+    for idx, (images, masks, targets) in enumerate(dataloader):
+        if idx >= n_batches:
+            break  # Exit after processing n_batches
+
+        print(idx, f' is anomaly:  {targets[0]}')
+        # Taking the first image from the batch and converting it to numpy
+        image_np = images[0].numpy().transpose((1, 2, 0))
+        plt.imshow(image_np)
+        plt.axis('off')  # Hide axis
+        plt.show()
