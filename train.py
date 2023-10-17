@@ -12,7 +12,7 @@ from utils import print_and_add_to_log, get_datasets_for_ViT, \
     Identity, freeze_finetuned_model, train, plot_graphs, \
     extract_fetures
 from os.path import join
-from pytorch_pretrained_vit.model import AnomalyViT, ViT
+from pytorch_pretrained_vit.model import AnomalyViT, ViT  # 
 
 if __name__ == '__main__':
 

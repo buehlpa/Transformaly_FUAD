@@ -103,7 +103,7 @@ class MVTecAD(VisionDataset):
         self.dataset_root = os.path.join(self.root, self.dataset_name)
         self.subset_name = subset_name.lower()
         self.subset_root = os.path.join(self.dataset_root, self.subset_name)
-        self.subset_split = os.path.join(self.subset_root, self.train_str if self.train else self.test_str)
+        self.subset_split = os.path.join(self.subset_root, self.train_str if self.train else self.test_str)  # subsets paths 
 
         if self.download is True:
             self.download_subset()

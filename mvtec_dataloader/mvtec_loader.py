@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from mvtec_ad import MVTecAD
+from mvtec_dataloader.mvtec_ad import MVTecAD
 
 
 def _convert_label(x):
