@@ -14,7 +14,7 @@ from torchvision.datasets.utils import download_and_extract_archive
 from torchvision.datasets.folder import is_image_file
 
 from typing import Optional, Callable, List, Tuple, Dict, Any
-
+import warnings
 
 class MVTecAD(VisionDataset):
     """
@@ -35,6 +35,7 @@ class MVTecAD(VisionDataset):
             downloaded again.
         pin_memory (bool, optional): If true, load all images into memory in this class.
             Otherwise, only image paths are kept.
+
      Attributes:
         subset_name (str): name of the loaded subset.
         classes (list): List of the class names sorted alphabetically.
@@ -44,6 +45,7 @@ class MVTecAD(VisionDataset):
         data (list): List of PIL images. not named with 'images' for consistence with common dataset, such as cifar.
         masks (list): List of PIL masks. mask is of the same size of image and indicate the anomaly pixels.
         targets (list): The class_index value for each image in the dataset.
+
     Note:
         The normal class index is 0.
         The abnormal class indexes are assigned 1 or higher alphabetically.
@@ -88,16 +90,20 @@ class MVTecAD(VisionDataset):
                  transform: Optional[Callable] = None,
                  target_transform: Optional[Callable] = None,
                  mask_transform: Optional[Callable] = None,
-                 download=True,
+                 download_subsets=True,
+                 download_fullset=True,
                  pin_memory=False):
 
-        super(MVTecAD, self).__init__(root, transform=transform,
-                                      target_transform=target_transform)
+
+
+        super(MVTecAD, self).__init__(root, transform=transform,target_transform=target_transform)
+
+
 
         self.train = train
         self.mask_transform = mask_transform
-        self.download = download
-        self.pin_memory = pin_memory
+        self.download_subsets = download_subsets
+        self.pin_memory = pin_memory # pin memory does help accelerate the process cpu to gpu 
 
         # path
         self.dataset_root = os.path.join(self.root, self.dataset_name)
@@ -105,11 +111,16 @@ class MVTecAD(VisionDataset):
         self.subset_root = os.path.join(self.dataset_root, self.subset_name)
         self.subset_split = os.path.join(self.subset_root, self.train_str if self.train else self.test_str)  # subsets paths 
 
-        if self.download is True:
+        # download the full dataset at once 
+        if download_fullset:
+            self.download_fullset()
+
+        # download subsets on the fly
+        if self.download_subsets is True:
             self.download_subset()
 
         if not os.path.exists(self.subset_root):
-            raise FileNotFoundError('subset {} is not found, please set download=True to download it.')
+            raise FileNotFoundError('subset {} is not found, please set download_subsets=True to download it.')
 
         # get image classes and corresponding targets
         self.classes, self.class_to_idx = self._find_classes(self.subset_split)
@@ -124,18 +135,21 @@ class MVTecAD(VisionDataset):
             self.data = self._load_images('RGB', self.image_paths)
             self.masks = self._load_images('L', self.mask_paths)
 
+
     def __getitem__(self, idx: int) -> Tuple[Any, Any, Any]:
         '''
         get item iter.
         :param idx (int): idx
         :return: (tuple): (image, mask, target) where target is index of the target class.
         '''
+
         # get image, mask and target of idx
         if self.pin_memory:
             image, mask = self.data[idx], self.masks[idx]
         else:
             image, mask = self._pil_loader('RGB', self.image_paths[idx]), self._pil_loader('L', self.mask_paths[idx])
         target = self.targets[idx]
+
 
         # apply transform
         if self.transform is not None:
@@ -147,6 +161,7 @@ class MVTecAD(VisionDataset):
 
         return image, mask, target
 
+
     def __len__(self) -> int:
         return len(self.targets)
 
@@ -155,18 +170,22 @@ class MVTecAD(VisionDataset):
         return 'using data: {data}\nsplit: {split}'.format(data=self.subset_name, split=split)
     
     def download_fullset(self):
-                '''
+        '''
         download the full dataset
         :return:
         '''
+
+        if os.path.exists(self.dataset_root):
+            warnings.warn("dataset already exists: skipping download, use download_fullset=False to suppress")
+            return
+
         os.makedirs(self.dataset_root, exist_ok=True)
+        filename_ext = self.dataset_name + self.compress_ext
 
         # download
-        filename = self.subset_name + self.compress_ext
-    
-        download_and_extract_archive(self.data_dict['mvtec_anomaly_detection'], self.dataset_root, filename=filename)
-
-
+        download_and_extract_archive(self.data_dict['mvtec_anomaly_detection'], self.dataset_root, filename=filename_ext)
+        # remove tarfile
+        os.remove(os.path.join(self.dataset_root, filename_ext))
 
     def download_subset(self):
         '''
