@@ -606,7 +606,7 @@ def get_datasets_for_ViT(dataset:str, data_path:str, one_vs_rest:bool, _class,
     # get dataset
     trainset_origin, testset = get_datasets(dataset, data_path, val_transforms)  # specific for dataset returns torch dataset type
 
-    train_indices = [i for i, val in enumerate(trainset_origin.targets)
+    train_indices = [i for i, val in enumerate(trainset_origin.targets) # takes all classes , transet targets is the labels
                      if val not in anomaly_classes]
     logging.info(f"len of train dataset {len(train_indices)}")
 
@@ -670,7 +670,18 @@ def get_datasets(dataset, data_path, val_transforms):
         testset = ImageFolder(root=data_path,
                               transform=val_transforms)
 
+        
     #TODO implement get dataset for mvtec
+
+
+    elif dataset == 'mv_tec':
+        trainset = ImageFolder(root=data_path,
+                               transform=val_transforms)
+        
+        testset = ImageFolder(root=data_path,
+                              transform=val_transforms)
+
+
 
     else:
         raise ValueError(f"{dataset} not supported yet!")

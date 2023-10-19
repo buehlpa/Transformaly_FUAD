@@ -47,7 +47,7 @@ if __name__ == '__main__':
     elif args['dataset'] == 'cats_vs_dogs':
         _classes = range(2)
     elif args['dataset'] == 'dior':
-        _classes = range(19)   ## TODO put MVTEC  classes here 
+        _classes = range(19)   ## TODO Mvtec classes 
     else:
         raise ValueError(f"Does not support the {args['dataset']} dataset")
     
