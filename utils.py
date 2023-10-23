@@ -592,34 +592,41 @@ def get_datasets_for_ViT(dataset:str, data_path:str, one_vs_rest:bool, _class,
                          normal_test_sample_only=True,
                          use_imagenet=False):
     
-    # one vs rest true means unimodal setting
+
 
     number_of_classes = get_number_of_classes(dataset)
+
     if one_vs_rest:
         anomaly_classes = [i for i in range(number_of_classes) if i != _class]
     else:
         anomaly_classes = [_class]
 
-    # preprocess images 
-    val_transforms = get_transforms(dataset=dataset,use_imagenet=use_imagenet)
+    # get the transformations for each dataset
+    val_transforms = get_transforms(dataset=dataset,use_imagenet=use_imagenet) 
 
     # get dataset
-    trainset_origin, testset = get_datasets(dataset, data_path, val_transforms)  # specific for dataset returns torch dataset type
+    trainset_origin, testset = get_datasets(dataset, data_path, val_transforms)  # specific for dataset returns whole torch dataset type
 
-    train_indices = [i for i, val in enumerate(trainset_origin.targets) # takes all classes , transet targets is the labels
-                     if val not in anomaly_classes]
+    # all indices of the normal class in the trainset
+    train_indices = [i for i, val in enumerate(trainset_origin.targets) if val not in anomaly_classes]
+    
     logging.info(f"len of train dataset {len(train_indices)}")
 
-    trainset = torch.utils.data.Subset(trainset_origin, train_indices) # split data into anomaly and normal classes
+    # get only the normal data from the trainset 
+    trainset = torch.utils.data.Subset(trainset_origin, train_indices) 
 
-
-
+    # only the normal class in the testset if normal_test_sample_only =true
     if normal_test_sample_only:
         test_indices = [i for i, val in enumerate(testset.targets)
                         if val not in anomaly_classes]
         testset = torch.utils.data.Subset(testset, test_indices)
 
     logging.info(f"len of test dataset {len(testset)}")
+
+
+    ## TODO implement loader for MVTEC special classes, per class : normal vs defect from same class.
+
+
     return trainset, testset
 
 

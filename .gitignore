@@ -5,8 +5,10 @@ data/*
 *.tar
 *.gz
 *.tar.xz
-
-
+*.pb
+*.tsv
+*.pyc
+*events.out*
 
 ## from github 
 

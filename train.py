@@ -109,6 +109,9 @@ if __name__ == '__main__':
 
         # TODO make sure to save the sets properly according to their contamination
 
+        # trainset = normaldata-class from full trainset , 
+        # testset  = normaldata-class from full test  ,
+        # ood_test_set = all other than normaldata-class from full testset
 
         trainset, testset = get_datasets_for_ViT(dataset=args['dataset'],
                                                  data_path=args['data_path'],
@@ -117,7 +120,7 @@ if __name__ == '__main__':
                                                  normal_test_sample_only=True,
                                                  use_imagenet=args['use_imagenet']
                                                  )
-        ##  get all the test data which are not in the distribution
+        
         _, ood_test_set = get_datasets_for_ViT(dataset=args['dataset'],
                                                data_path=args['data_path'],
                                                one_vs_rest=not args['unimodal'],   
@@ -125,6 +128,11 @@ if __name__ == '__main__':
                                                normal_test_sample_only=True,
                                                use_imagenet=args['use_imagenet']
                                                )
+
+
+
+
+
 
         print_and_add_to_log("---------------", logging)
         print_and_add_to_log(f'Class size: {args["_class"]}', logging)
